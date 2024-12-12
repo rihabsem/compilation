@@ -1,0 +1,48 @@
+{
+    "lexical_error": [
+        {
+            "Type": "lexical",
+            "Description": "Illegal character 'h'",
+            "Position": 0,
+            "Line": 1
+        },
+        {
+            "Type": "lexical",
+            "Description": "Illegal character 'i'",
+            "Position": 0,
+            "Line": 1
+        },
+        {
+            "Type": "lexical",
+            "Description": "Illegal character 'p'",
+            "Position": 0,
+            "Line": 1
+        },
+        {
+            "Type": "lexical",
+            "Description": "Illegal character 'h'",
+            "Position": 13,
+            "Line": 1
+        }
+    ],
+    "syntactic_error": [
+        {
+            "Type": "syntactic",
+            "Description": "Syntax error at token 'NOUNS' with value 'lord'",
+            "Position": 0,
+            "Line": 1
+        },
+        {
+            "Type": "syntactic",
+            "Description": "Syntax error at token 'CONJUNCTIONS' with value 'and'",
+            "Position": 0,
+            "Line": 1
+        },
+        {
+            "Type": "syntactic",
+            "Description": "Syntax error at token 'NOUNS' with value 'lord'",
+            "Position": 0,
+            "Line": 1
+        }
+    ]
+}

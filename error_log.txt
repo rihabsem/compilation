@@ -1,0 +1,2 @@
+[CRITICAL] [Type: Lexical] Description: Illegal character 'l' | Line: 1, Position: 4
+[CRITICAL] [Type: Lexical] Description: Illegal character 'j' | Line: 1, Position: 0

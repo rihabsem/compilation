@@ -1,0 +1,66 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    ADJECTIVES
+    ADVERBS
+    ARTICLES
+    CONJUNCTIONS
+    DETERMINANT
+    INTERJECTIONS
+    LPAREN
+    NOUNS
+    PREPOSITIONS
+    PRONOUNS
+    PUNCTUATION
+    RPAREN
+
+Grammar
+
+Rule 0     S' -> S
+Rule 1     S -> VERBS
+
+Terminals, with rules where they appear
+
+ADJECTIVES           : 
+ADVERBS              : 
+ARTICLES             : 
+CONJUNCTIONS         : 
+DETERMINANT          : 
+INTERJECTIONS        : 
+LPAREN               : 
+NOUNS                : 
+PREPOSITIONS         : 
+PRONOUNS             : 
+PUNCTUATION          : 
+RPAREN               : 
+VERBS                : 1
+error                : 
+
+Nonterminals, with rules where they appear
+
+S                    : 0
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . S
+    (1) S -> . VERBS
+
+    VERBS           shift and go to state 2
+
+    S                              shift and go to state 1
+
+state 1
+
+    (0) S' -> S .
+
+
+
+state 2
+
+    (1) S -> VERBS .
+
+    $end            reduce using rule 1 (S -> VERBS .)
+

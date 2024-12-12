@@ -1,8 +1,63 @@
 import ply.lex as lex
 import ply.yacc as yacc
 import logging
+import json
+import os 
 null_logger = logging.getLogger("ply")
 null_logger.setLevel(logging.CRITICAL)
+
+#creating a json file :
+
+def writeJson(data, filename=r'C:\Users\DELL\Desktop\S7\compilation\projet\code\compilation\errorLog.json'):
+    # Check if the file exists in our file system using the library "os"
+    if os.path.exists(filename): 
+        # Read existing data
+        with open(filename, 'r') as f:
+            try:
+                existing_data = json.load(f) #storing the existing data in the json file in a list called existing_data
+            except json.JSONDecodeError:
+                existing_data = {"lexical_error": [], "syntactic_error": []}
+    else:
+        existing_data = {"lexical_error": [], "syntactic_error": []}
+    
+    # Merge new data with existing data
+    for key in data:
+        existing_data[key].extend(data[key]) #appending the new error in the existing_data list
+    
+    # Write the merged data back to the file
+    with open(filename, 'w') as f:
+        json.dump(existing_data, f, indent=4) #updating the json file
+
+
+#dictionary
+dataDic = {
+    "lexical_error": [],
+    "syntactic_error": []
+}
+dataTemplate = {
+        "Type": "",
+        "Description": "",
+        "Position": "",
+        "Line":""
+   
+}
+
+#function for storing the errors in the dictionaries defined before
+def errorLog(error_type, description, line=None, position=None):
+    errorEntry = dataTemplate.copy()
+    errorEntry["Type"] = error_type
+    errorEntry["Description"] = description
+    errorEntry["Line"] = line
+    errorEntry["Position"] = position
+
+    if error_type == "lexical":
+        dataDic["lexical_error"].append(errorEntry)
+    elif error_type == "syntactic":
+        dataDic["syntactic_error"].append(errorEntry)
+
+
+
+
 # TOKENS
 tokens = (
     "NOUNS",
@@ -55,7 +110,12 @@ def lexicalAnalysis() :
 
 # Error handling
 def t_error(t):
-    raise Exception(f"Illegal character '{t.value[0]}'")
+    error_message = f"Illegal character '{t.value[0]}'"
+    errorLog("lexical", error_message, t.lineno, t.lexpos)
+    writeJson(dataDic)
+    raise Exception(f"ERROR: '{error_message}'")
+    t.lexer.skip(1)
+    
 
 # Newline handling to track line numbers
 def t_newline(t):
@@ -64,109 +124,23 @@ def t_newline(t):
 #S grammatical rule
 def p_S(p):
     '''
-    S : 
-      | ADVERBS VP ADVP VERBS ADVERBS VERBS PREPOSITIONS VERBS S
-      | CON S
-      | PRONOUNS S
-      | ADVP S
-      | NP S
-      | VP S
-      | ADJP S
-      | INTERJECTIONS S
-      | LPAREN S RPAREN
-      | NG S
-      | PP S
-      | PUN S
-      | DETERMINANT S
-      | ARTICLES S
-      | PREPOSITIONS S
-      | PP
+    S : VERBS
     '''
-    print(f"Rule matched: S → {p[1:]}")
+    filtered_p = [item for item in p[1:] if item is not None]
+    print(f"Rule matched: S → {filtered_p}")
 
-#ADVP grammatical rule
-def p_ADVP(p):
-    '''
-    ADVP : ADVERBS
-    | ADVERBS NOUNS
-    | ADVERBS VP
-    | ADVP PUNCTUATION ADVERBS NOUNS
-    | ADVERBS VP PP
-    | ADVERBS S
-    '''
-    print(f"Rule matched: ADVP → {p[1:]}")
 
-#ADJP grammatical rule
-def p_ADJP(p):
-    '''
-    ADJP : ADJECTIVES 
-    | ADJECTIVES NP
-    | ADJECTIVES VP
-    '''
-    print(f"Rule matched: ADJP → {p[1:]}")
-
-#NP grammatical rule
-def p_NP(p):
-    '''
-    NP : NOUNS 
-    | NP PREPOSITIONS ADJECTIVES
-    | DETERMINANT S NP
-    | ARTICLES NOUNS
-    '''
-    print(f"Rule matched: NP → {p[1:]}")
-
-#VP grammatical rules
-def p_VP(p):
-    '''
-    VP : VERBS
-       | VP ADVP
-       | VP ARTICLES
-       | PRONOUNS VP
-       | VP NOUNS
-       | VERBS PREPOSITIONS NOUNS
-       | VERBS ADJECTIVES NOUNS
-       | ARTICLES NOUNS VERBS
-       | DETERMINANT VERBS NOUNS
-       | PRONOUNS NOUNS VERBS ADJECTIVES
-       | VP LPAREN S RPAREN
-    '''
-    print(f"Rule matched: VP → {p[1:]}")
-# NG grammatical rule
-def p_NG(p):
-    '''
-    NG : ADVERBS DETERMINANT ADJECTIVES NOUNS
-    '''
-    print(f"Rule matched: NG → {p[1:]}")
-
-#PP grammatical rules
-def p_PP(p):
-    '''
-    PP : PREPOSITIONS
-       | PREPOSITIONS ARTICLES NOUNS
-       | PP NOUNS
-       | PP PRONOUNS
-       | PREPOSITIONS VERBS
-       | PP ARTICLES NOUNS
-    '''
-    print(f"Rule matched: PP → {p[1:]}")
-
-#CON grammatical rules
-def p_CON(p):
-    '''CON : CONJUNCTIONS'''
-    print(f"Rule matched: CON → {p[1:]}")
-
-#PUN grammatical rules
-def p_PUN(p):
-    '''
-    PUN : PUNCTUATION
-    '''
-    print(f"Rule matched: PUN → {p[1:]}")
 
 def p_error(p):
     if p:
-        print(f"Syntax error at token '{p.type}' with value '{p.value}'")
+        error_message = f"Syntax error at token '{p.type}' with value '{p.value}'"
+        errorLog("syntactic", error_message, p.lineno, p.lexpos)
+        print(error_message)
     else:
-        print("Syntax error at EOF (end of file)")
+        error_message = "Syntax error at EOF (end of file)"
+        errorLog("syntactic", error_message)
+        print(error_message)
+    writeJson(dataDic)
 
 def main():
     tokens_list = lexicalAnalysis()  # Perform lexical analysis
@@ -182,9 +156,8 @@ def main():
     else:
         print("Error in lexical analysis. Syntactic analysis will not be performed.")
 
+
 if __name__ == "__main__":
     main()
-#| VERBS VERBS ADVERBS LPAREN VERBS ADVERBS VERBS PREPOSITIONS ARTICLES NOUNS RPAREN
-#| VERBS VERBS ADVERBS LPAREN VERBS VERBS PREPOSITIONS ARTICLES NOUNS RPAREN
 
 
